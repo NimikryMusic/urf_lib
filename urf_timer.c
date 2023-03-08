@@ -3,7 +3,7 @@
 
 //once per TIME_RESOLUTION microseconds timer interrupt is called and all times are updated
 //
-#define TIME_RESOLUTION 250
+#define TIME_RESOLUTION 100 //250
 
 volatile uint32_t mcs_time = 0;
 volatile uint32_t ms_time = 0;
