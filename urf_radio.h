@@ -33,6 +33,19 @@ typedef struct {
     };
 } NRF52_PCNF1_REG;
 
+typedef struct {
+	union {
+		uint32_t reg;
+		struct {
+			unsigned crc_len : 2;
+			unsigned : 6;
+			unsigned skip_addr : 1;
+			unsigned : 7;
+			unsigned : 16;
+		};
+	};
+} NRF52_CRCCNF_REG;
+
 enum
 {
 	st_radio_disabled = 0,
@@ -56,8 +69,8 @@ enum
 };
 
 void rf_disable();
-void rf_init(int channel, int speed, int crc_len);
-void rf_init_ext(int channel, int speed, int crc_len, int white_en, int s1_sz, int added_length, int max_length);
+void rf_init(int channel, int speed, int crc_len, int crc_skipaddr);
+void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s1_sz, int added_length, int max_length);
 void rf_mode_rx_only();
 void rf_mode_tx_only();
 void rf_mode_tx_then_rx();

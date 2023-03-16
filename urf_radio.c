@@ -44,7 +44,7 @@ void rf_disable()
     NRF_RADIO->EVENTS_DISABLED = 0;
 }
 
-void rf_init_ext(int channel, int speed, int crc_len, int white_en, int s1_sz, int added_length, int max_length)
+void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s1_sz, int added_length, int max_length)
 {
 	NVIC_DisableIRQ(RADIO_IRQn);
 	NRF_RADIO->POWER = 1;
@@ -70,7 +70,11 @@ void rf_init_ext(int channel, int speed, int crc_len, int white_en, int s1_sz, i
 
 	NRF52_PCNF0_REG conf0;
 	conf0.reg = 0;
-	conf0.length_bitsz = 8;
+	{
+		int n = 1, tmp = max_length;
+		while(tmp >>= 1) n++;
+		conf0.length_bitsz = n; // max length 128 but we use 76 = 0b01001100 currently, so it needs 7 bits
+	}	
 	conf0.S0_bytesz = 1;
 	conf0.S1_bitsz = s1_sz;
 	conf0.S1_include = 0;
@@ -93,7 +97,11 @@ void rf_init_ext(int channel, int speed, int crc_len, int white_en, int s1_sz, i
 	NRF_RADIO->TIFS = 30;
 
     // CRC Config
-	NRF_RADIO->CRCCNF = crc_len;
+    NRF52_CRCCNF_REG crc;
+    crc.crc_len = crc_len;
+    crc.skip_addr = crc_skipaddr;
+
+	NRF_RADIO->CRCCNF = crc.reg; // skipaddr
 	NRF_RADIO->CRCINIT = 0b10101010;   // Initial value
 	NRF_RADIO->CRCPOLY = 0b100000111;  // CRC poly: x^8+x^2+x^1+1
 	NRF_RADIO->EVENTS_DISABLED = 0;
@@ -107,9 +115,9 @@ void rf_init_ext(int channel, int speed, int crc_len, int white_en, int s1_sz, i
 	NVIC_EnableIRQ(RADIO_IRQn);
 }
 
-void rf_init(int channel, int speed, int crc_len)
+void rf_init(int channel, int speed, int crc_len, int crc_skipaddr)
 {
-	rf_init_ext(channel, speed, crc_len, 1, 0, 0, pack_max_length);
+	rf_init_ext(channel, speed, crc_len, crc_skipaddr, 1, 0, 0, pack_max_length);
 }
 
 void rf_mode_rx_only()
