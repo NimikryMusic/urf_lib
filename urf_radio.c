@@ -44,7 +44,7 @@ void rf_disable()
     NRF_RADIO->EVENTS_DISABLED = 0;
 }
 
-void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s1_sz, int added_length, int max_length)
+void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s0_sz, int s1_sz, int added_length, int max_length)
 {
 	NVIC_DisableIRQ(RADIO_IRQn);
 	NRF_RADIO->POWER = 1;
@@ -75,7 +75,7 @@ void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int whit
 		while(tmp >>= 1) n++;
 		conf0.length_bitsz = n; // max length 128 but we use 76 = 0b01001100 currently, so it needs 7 bits
 	}	
-	conf0.S0_bytesz = 1;
+	conf0.S0_bytesz = s0_sz;
 	conf0.S1_bitsz = s1_sz;
 	conf0.S1_include = 0;
 	conf0.preamble_length = 0;
@@ -117,7 +117,7 @@ void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int whit
 
 void rf_init(int channel, int speed, int crc_len, int crc_skipaddr)
 {
-	rf_init_ext(channel, speed, crc_len, crc_skipaddr, 1, 0, 0, pack_max_length);
+	rf_init_ext(channel, speed, crc_len, crc_skipaddr, 1, 1, 0, 0, pack_max_length);
 }
 
 void rf_mode_rx_only()
@@ -213,7 +213,7 @@ uint32_t rf_get_packet(uint8_t *pack)
 	for(int x = 0; x < (rx_packet[1]>>2)+1; x++)
 		*pp++ = *rp++;
 	last_processed_rx_packet = rx_packet_counter;
-	return rx_packet[1];
+	return rx_packet[1]; // packet size minus PACKET_ID_SIZE + PACKET_MESSAGE_LEN_SIZE
 }
 
 void rf_autorespond_on(uint8_t *pack_crc_ok, uint8_t *pack_crc_fail, int resp_pack_length)

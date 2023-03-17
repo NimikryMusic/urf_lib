@@ -70,7 +70,7 @@ enum
 
 void rf_disable();
 void rf_init(int channel, int speed, int crc_len, int crc_skipaddr);
-void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s1_sz, int added_length, int max_length);
+void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int white_en, int s0_sz, int s1_sz, int added_length, int max_length);
 void rf_mode_rx_only();
 void rf_mode_tx_only();
 void rf_mode_tx_then_rx();
