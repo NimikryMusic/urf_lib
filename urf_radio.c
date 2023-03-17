@@ -78,7 +78,7 @@ void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int whit
 	conf0.S0_bytesz = s0_sz;
 	conf0.S1_bitsz = s1_sz;
 	conf0.S1_include = 0;
-	conf0.preamble_length = 0;
+	conf0.preamble_length = 0; // 8 bit really
 	
     // Packet configuration
     NRF_RADIO->PCNF0 = conf0.reg;
@@ -221,9 +221,9 @@ void rf_autorespond_on(uint8_t *pack_crc_ok, uint8_t *pack_crc_fail, int resp_pa
 	resp_length = resp_pack_length;
 	if(resp_length > 30) resp_length = 30;
 	resp_crc_ok[0] = 111;
-	resp_crc_ok[1] = resp_length+2;
+	resp_crc_ok[1] = resp_length;
 	resp_crc_fail[0] = 100;
-	resp_crc_fail[1] = resp_length+2;
+	resp_crc_fail[1] = resp_length;
 	for(int x = 0; x < resp_length; x++)
 	{
 		resp_crc_ok[2+x] = pack_crc_ok[x];
