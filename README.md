@@ -1,4 +1,15 @@
 # urf_lib
+
+# Prerequisites 
+1. Download and install https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads Version 12.2.Rel1
+2. In urf_lib/nrf_usdk52/gcc/ create Makefile.posix and put the text below adapting the GNU_INSTALL_ROOT if you didn't install it onto the default location:
+
+GNU_INSTALL_ROOT := /Applications/ArmGNUToolchain/12.2.rel1/arm-none-eabi/bin/
+GNU_VERSION := 12.2.1
+GNU_PREFIX := arm-none-eabi
+
+------------
+
 Library with BLE stack implementation and various useful functions for nRF52832 MCU
 
 Please note that code inside nrf_usdk52 folder is licensed under different terms (coming from Nordic and ARM, in contrary to all other code which is developed by our team) and is not subject of MIT license used for all other code
