@@ -3,6 +3,8 @@
 #include "nrf.h"
 #include <stdlib.h> //NULL
 
+#include "digitaize_common.h"
+
 uint32_t pack_max_length = 255;  //maximum length in bytes
 uint32_t pack_payload;  //current payload size in bytes
 
@@ -73,12 +75,12 @@ void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int whit
 	{
 		int n = 1, tmp = max_length;
 		while(tmp >>= 1) n++;
-		conf0.length_bitsz = n; // max length 128 but we use 76 = 0b01001100 currently, so it needs 7 bits
+		conf0.length_bitsz = n; // max length 128 but we use 76 = 0b01001010 currently, so it needs 7 bits
 	}	
 	conf0.S0_bytesz = s0_sz;
 	conf0.S1_bitsz = s1_sz;
 	conf0.S1_include = 0;
-	conf0.preamble_length = 0; // 8 bit really
+	conf0.preamble_length = 0; // 8bit --> PACKET_PREAMBLE_SIZE 1
 	
     // Packet configuration
     NRF_RADIO->PCNF0 = conf0.reg;
@@ -187,13 +189,14 @@ void rf_listen()
 }
 void rf_send_and_listen(uint8_t *pack, int length)
 {
-	uint32_t *pp = (uint32_t*)pack;
-	uint32_t *tp = (uint32_t*)tx_packet;
-	for(int x = 0; x < (length>>2)+1; x++)
-		*tp++ = *pp++;
+	// uint32_t *pp = (uint32_t*)pack;
+	// uint32_t *tp = (uint32_t*)tx_packet;
+	// for(int x = 0; x < (length>>2)+1; x++)
+	// 	*tp++ = *pp++;
 	
-//	for(int x = 0; x < length; x++)
-//		tx_packet[x] = pack[x];
+	for(int x = 0; x < length; x++)
+		tx_packet[x] = pack[x];
+
 	uint32_t start_ms;
 	if(rf_busy) start_ms = millis();
 	while(rf_busy && millis() - start_ms < 3) ;
@@ -204,14 +207,17 @@ int rf_has_new_packet()
 {
 	return (last_processed_rx_packet != rx_packet_counter);
 }
+
 uint32_t rf_get_packet(uint8_t *pack)
 {
-//	for(int x = 0; x < rx_packet[1]; x++)
-//		pack[x] = rx_packet[x];
-	uint32_t *pp = (uint32_t*)pack;
-	uint32_t *rp = (uint32_t*)rx_packet;
-	for(int x = 0; x < (rx_packet[1]>>2)+1; x++)
-		*pp++ = *rp++;
+	for(int x = 0; x < rx_packet[1] + PACKET_ID_SIZE + PACKET_PAYLOAD_LEN_SIZE; x++)
+		pack[x] = rx_packet[x];
+
+	// uint32_t *pp = (uint32_t*)pack;
+	// uint32_t *rp = (uint32_t*)rx_packet;
+	// for(int x = 0; x < (rx_packet[1]>>2)+1; x++)
+	// 	*pp++ = *rp++;
+
 	last_processed_rx_packet = rx_packet_counter;
 	return rx_packet[1]; // packet size minus PACKET_ID_SIZE + PACKET_MESSAGE_LEN_SIZE
 }
