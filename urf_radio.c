@@ -96,7 +96,7 @@ void rf_init_ext(int channel, int speed, int crc_len, int crc_skipaddr, int whit
     // Packet configuration
     NRF_RADIO->PCNF1 = conf1.reg;
 
-	NRF_RADIO->TIFS = 30;
+	NRF_RADIO->TIFS = RADIO_TIFS;
 
     // CRC Config
     NRF52_CRCCNF_REG crc;
