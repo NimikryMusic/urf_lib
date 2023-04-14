@@ -2,8 +2,8 @@
 #include "nrf.h"
 
 //once per TIME_RESOLUTION microseconds timer interrupt is called and all times are updated
-//
-#define TIME_RESOLUTION 100 //250
+
+#include "digitaize_common.h" // for #define TIME_RESOLUTION
 
 volatile uint32_t mcs_time = 0;
 volatile uint32_t ms_time = 0;
